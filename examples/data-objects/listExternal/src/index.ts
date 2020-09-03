@@ -3,9 +3,9 @@
  * Licensed under the MIT License.
  */
 
-import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
+import { DataObjectFactory } from "@fluidframework/aqueduct";
 import { ListComponent } from "./listComponent";
-import { SharedDirectory } from "../../../../packages/framework/aqueduct/node_modules/@fluidframework/map/dist";
+import { SharedDirectory } from "@fluidframework/map";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
