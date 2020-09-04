@@ -3,12 +3,15 @@
  * Licensed under the MIT License.
  */
 
-import { IRequest, IResponse } from "@fluidframework/core-interfaces";
+import {
+    IRequest,
+    IResponse,
+    IFluidHandle,
+} from "@fluidframework/core-interfaces";
 import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
-import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { SharedDirectory, IDirectoryValueChanged } from "@fluidframework/map";
-import { ConfigKey } from "./configKey";
 import { v4 as uuid } from "uuid";
+import { ConfigKey } from "./configKey";
 
 // Sample agent to run.
 export class ListComponent extends DataObject {
@@ -27,7 +30,7 @@ export class ListComponent extends DataObject {
         [SharedDirectory.getFactory()],
         {},
         [],
-        true
+        true,
     );
 
     protected async initializingFirstTime() {
@@ -43,12 +46,17 @@ export class ListComponent extends DataObject {
         ]);
 
         this.lists = await listsHandle.get();
-
+        this.hasValueChanged();
         this.forwardEvent(this.lists, "op", "sequenceDelta");
     }
 
     public hasValueChanged() {
-        this.lists!.on("valueChanged", (changed: IDirectoryValueChanged) => {});
+        if (this.lists !== undefined) {
+            this.lists.on("valueChanged", (changed: IDirectoryValueChanged) => {
+                console.log("changed", changed);
+            });
+            return "cool";
+        }
     }
 
     /**
@@ -63,11 +71,10 @@ export class ListComponent extends DataObject {
      * @param listId
      */
     public createList(listId?: string) {
-        if (listId) {
+        if (listId !== undefined) {
             return this.lists?.createSubDirectory(listId);
         } else {
-            const listId = uuid();
-            return this.lists?.createSubDirectory(listId);
+            return this.lists?.createSubDirectory(uuid());
         }
     }
 

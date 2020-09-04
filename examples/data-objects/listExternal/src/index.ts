@@ -4,8 +4,8 @@
  */
 
 import { DataObjectFactory } from "@fluidframework/aqueduct";
-import { ListComponent } from "./listComponent";
 import { SharedDirectory } from "@fluidframework/map";
+import { ListComponent } from "./listComponent";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
@@ -17,7 +17,7 @@ export const ListComponentInstantiationFactory = new DataObjectFactory(
     ListComponentName,
     ListComponent,
     [SharedDirectory.getFactory()],
-    {}
+    {},
 );
 
 export const fluidExport = ListComponentInstantiationFactory;
