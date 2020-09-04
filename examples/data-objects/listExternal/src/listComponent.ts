@@ -6,7 +6,7 @@
 import { IRequest, IResponse } from "@fluidframework/core-interfaces";
 import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
-import { SharedDirectory } from "@fluidframework/map";
+import { SharedDirectory, IDirectoryValueChanged } from "@fluidframework/map";
 import { ConfigKey } from "./configKey";
 import { v4 as uuid } from "uuid";
 
@@ -45,6 +45,10 @@ export class ListComponent extends DataObject {
         this.lists = await listsHandle.get();
 
         this.forwardEvent(this.lists, "op", "sequenceDelta");
+    }
+
+    public hasValueChanged() {
+        this.lists!.on("valueChanged", (changed: IDirectoryValueChanged) => {});
     }
 
     /**
