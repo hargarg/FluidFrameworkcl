@@ -4,8 +4,11 @@
  */
 
 import { DataObjectFactory } from "@fluidframework/aqueduct";
-// import { ListComponentName } from "@fluid-example/listexternal";
+import { ListComponentName } from "@fluid-example/listexternal";
 import { MainController } from "./model";
+import { ViewControllerType } from "./componentTypes";
+import { getViewControllerPromise } from "./view";
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
 export const controllerName = pkg.name as string;
@@ -16,9 +19,8 @@ export const ClickerInstantiationFactory = new DataObjectFactory(
     [],
     {},
     [
-        [ "@fluid-example/listexternal", import("@fluid-example/listexternal").then(
-            (m) => m.ListComponent.getFactory())],
+        [ViewControllerType, getViewControllerPromise().then((m) =>m.getFactory())],
+        [ListComponentName, import("@fluid-example/listexternal").then((m) => m.ListComponent.getFactory())],
     ],
 );
-
 export const fluidExport = ClickerInstantiationFactory;
