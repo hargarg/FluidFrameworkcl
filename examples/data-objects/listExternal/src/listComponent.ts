@@ -13,6 +13,10 @@ import { SharedDirectory, IDirectoryValueChanged } from "@fluidframework/map";
 import { v4 as uuid } from "uuid";
 import { ConfigKey } from "./configKey";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const pkg = require("../package.json");
+const ListComponentName = pkg.name as string;
+
 // Sample agent to run.
 export class ListComponent extends DataObject {
     private lists?: SharedDirectory;
@@ -25,7 +29,7 @@ export class ListComponent extends DataObject {
     }
 
     private static readonly factory = new DataObjectFactory(
-        "ListComponent",
+        ListComponentName,
         ListComponent,
         [SharedDirectory.getFactory()],
         {},

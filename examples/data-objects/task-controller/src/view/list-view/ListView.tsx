@@ -14,8 +14,6 @@ export class ListView extends React.Component<ListViewProps, ListViewState> {
     }
 
     render() {
-        return (
-            <div>List View component</div>
-        );
+        return <div>List View component</div>;
     }
-} 
+}
