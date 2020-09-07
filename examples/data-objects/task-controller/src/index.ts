@@ -3,15 +3,11 @@
  * Licensed under the MIT License.
  */
 
-import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
-
+import { DataObjectFactory } from "@fluidframework/aqueduct";
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
 export const controllerName = pkg.name as string;
-
-export class Controller extends DataObject {
-
-}
+import { Controller } from './model/DataController';
 
 export const ClickerInstantiationFactory = new DataObjectFactory(
     controllerName,

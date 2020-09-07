@@ -19,5 +19,5 @@ export const ListComponentInstantiationFactory = new DataObjectFactory(
     [SharedDirectory.getFactory()],
     {},
 );
-
+export * from "./listComponent";
 export const fluidExport = ListComponentInstantiationFactory;
