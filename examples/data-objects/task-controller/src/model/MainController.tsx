@@ -5,12 +5,12 @@ import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { ListComponent } from "@fluid-example/listexternal";
 import { IFluidHTMLView } from "@fluidframework/view-interfaces";
 import { IDirectory } from "@fluidframework/map";
-import { ListView, ViewMethods } from "../view";
+import { ListView, ViewCallbacks } from "../view";
 
 const listComponentKey = "listComponent";
 const viewModelKey = "viewModel";
 
-export class Controller extends DataObject implements IFluidHTMLView, ViewMethods {
+export class Controller extends DataObject implements IFluidHTMLView, ViewCallbacks {
     public get IFluidHTMLView() {
         return this;
     }
@@ -42,7 +42,7 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewMethod
             <ListView
                 dataModel={this.dataModel}
                 viewModel={this.viewModel}
-                methods={this}/>,
+                callbacks={this}/>,
             elm);
     }
 }
