@@ -2,10 +2,10 @@ import { IDirectory } from "@fluidframework/map";
 import { ListComponent } from "@fluid-example/listexternal";
 
 export interface ViewProps extends ViewBaseProps {
-    methods: ViewMethods;
+    callbacks: ViewCallbacks;
 }
 
-export interface ViewMethods {
+export interface ViewCallbacks {
     methodName?: () => void;
 }
 
