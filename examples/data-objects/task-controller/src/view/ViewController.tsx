@@ -1,12 +1,12 @@
 import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
 import { IFluidHTMLView } from "@fluidframework/view-interfaces";
-import * as ReactDOM from "react-dom";
-import * as React from "react";
+// import * as ReactDOM from "react-dom";
+// import * as React from "react";
 import { SharedDirectory } from "@fluidframework/map";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { ListComponent } from "@fluid-example/listexternal";
 import { ViewControllerType } from "../componentTypes";
-import { ListView } from "./list-view";
+// import { ListView } from "./list-view";
 
 const viewModelKey = "viewModel";
 const dataModelKey = "dataModel";
@@ -53,11 +53,11 @@ export class ViewController extends DataObject implements IFluidHTMLView {
     }
 
     public render(div: HTMLElement) {
-        const model = {
-            viewModel: this.viewModel,
-            dataModel: this.dataModel,
-        };
-        ReactDOM.render(<ListView model={model} />, div);
+        // const model = {
+        //     viewModel: this.viewModel,
+        //     dataModel: this.dataModel,
+        // };
+        // ReactDOM.render(<ListView model={model} />, div);
         return div;
     }
 }
