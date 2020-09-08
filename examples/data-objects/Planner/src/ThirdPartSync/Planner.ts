@@ -7,15 +7,12 @@ import {
   PlannerPlan,
   PlannerTaskFormat
 } from '../service/PlannerService';
-import { TokenProvider } from '@fluidx/office-fluid-types';
 import { ITelemetryBaseLogger } from '@fluidframework/common-definitions';
 
 import { TaskDataSync, Task, Bucket, Board } from './ITaskDataSync';
 import { PlannerStore, PlannerStoreTask, PlannerStoreBucket } from './PlannerStore';
 import { DeltaHandler } from './DeltaHandler';
 import { handleGraphTaskForStore, convertGraphTaskToTaskIntance } from './Conversion';
-import { Activity } from '../telemetry';
-import { ActivityTracker } from '@fluidx/utilities';
 
 import {
   initializeStoreAndSharePlanWithUser,
@@ -54,14 +51,14 @@ export class Planner implements TaskDataSync {
   private logger: ITelemetryBaseLogger | undefined;
 
   constructor(
-    private tokenProvider: TokenProvider | undefined,
+    private tokenProvider: any | undefined,
     readonly loggerPromise: Promise<ITelemetryBaseLogger | undefined>
   ) {
     loggerPromise
       .then((logger) => {
         this.logger = logger;
       })
-      .catch(() => {});
+      .catch(() => { });
     this.plannerService = new PlannerService(this.tokenProvider!);
     // tslint:disable-next-line: no-floating-promises
     this.plannerStore = new PlannerStore();
@@ -157,16 +154,16 @@ export class Planner implements TaskDataSync {
       assignee: task.assignee ? task.assignee : [],
       dueDate: task.dueDate
     } as PlannerTask;
-    const tracker = ActivityTracker.start(Activity.AddTaskTrack, this.logger);
+
 
     const response = await this.plannerService.createTaskInBucket(taskPlanner);
     if (response.status === 403) {
-      tracker.setResult(false, { errorCode: response.status }, { message: response.statusText });
+
       return undefined;
     }
     const data = response.ok ? await response.json() : undefined;
     if (!data) {
-      tracker.setResult(false, { errorCode: response.status }, { message: response.statusText });
+
       return undefined;
     }
     task.id = data.id;
@@ -182,7 +179,7 @@ export class Planner implements TaskDataSync {
       plannerStoreTask = await addTaskDetailsToPlannerTaskStore(plannerStoreTask, taskDetail);
     }
     this.plannerStore.setTaskObjectMap(data.id, plannerStoreTask);
-    tracker.setResult(true);
+
 
     return task;
   }
@@ -195,7 +192,7 @@ export class Planner implements TaskDataSync {
     if (!this.syncEnabled) {
       return undefined;
     }
-    const tracker = ActivityTracker.start(Activity.CreateBoardTrack, this.logger);
+
     const getCurrentUser = await this.plannerService.getMe();
     const groupResponse = await this.plannerService.createGroup(getCurrentUser.id, boardName);
     const response = await this.plannerService.createPlan(groupResponse['id'], boardName);
@@ -207,7 +204,7 @@ export class Planner implements TaskDataSync {
       etag: data['@odata.etag'],
       groupId: data['owner']
     });
-    tracker.setResult(true);
+
     return { boardId: data['id'], boardName: data['title'] } as Board;
   }
 
@@ -220,7 +217,7 @@ export class Planner implements TaskDataSync {
     if (!this.syncEnabled) {
       return undefined;
     }
-    const tracker = ActivityTracker.start(Activity.CreateBucketTrack, this.logger);
+
     const plannerBucket: PlannerBucket = { planId: boardId, name, id: '' } as PlannerBucket;
     const response = await this.plannerService.createBucketForPlan(plannerBucket);
     const data = response ? await response.json() : undefined;
@@ -231,7 +228,7 @@ export class Planner implements TaskDataSync {
       tasks: []
     };
     this.plannerStore.setPlanBucketMap(bucket);
-    tracker.setResult(true);
+
     return bucket;
   }
 
@@ -274,7 +271,6 @@ export class Planner implements TaskDataSync {
       status: task.status === false ? 0 : 100
     } as PlannerTask;
 
-    const tracker = ActivityTracker.start(Activity.UpdateTaskTrack, this.logger);
     const response = await this.plannerService.updateTask(taskplan, assigneeToBeRemoved);
 
     if (task.description !== undefined && plannerStoreTask?.description !== task.description) {
@@ -286,13 +282,11 @@ export class Planner implements TaskDataSync {
       } as PlannerTaskDetails);
     }
     if (response.status === 412 || response.status === 409) {
-      tracker.setResult(false, { errorCode: response.status }, { message: response.statusText });
       await UpdateTaskStoreMapForTask(task.id, this.plannerStore, this.plannerService);
       // tslint:disable-next-line: no-floating-promises
       await this.updateTask(task);
     }
     if (response.ok && task.id) {
-      tracker.setResult(true);
       plannerStoreTask = { ...plannerStoreTask, ...task };
       plannerStoreTask.etag = etag_val;
       this.plannerStore.setTaskObjectMap(task.id, plannerStoreTask);
@@ -317,17 +311,14 @@ export class Planner implements TaskDataSync {
         id: taskId,
         etag: etag_val
       } as PlannerTask;
-      const tracker = ActivityTracker.start(Activity.DeleteTaskTrack, this.logger);
       const response = await this.plannerService.deletetask(plannerTask);
       if (!response) {
         return undefined;
       }
       if (response.status === 412 || response.status === 409) {
-        tracker.setResult(false, { errorCode: response.status }, { message: response.statusText });
         retry_count = retry_count - 1;
       }
       if (response.ok) {
-        tracker.setResult(true);
         const task = this.plannerStore.getTaskStoreMap(taskId);
         if (task) this.plannerStore.deleteTaskFromStore(task);
         return response;

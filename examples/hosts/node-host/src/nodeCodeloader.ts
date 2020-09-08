@@ -21,8 +21,8 @@ const signalFileName = "dummy";
 export class NodeCodeLoader {
     constructor(
         private readonly packageDirectory: string,
-        private readonly waitTimeoutMSec: number) {
-    }
+        private readonly waitTimeoutMSec: number,
+    ) { }
 
     public async load<T>(pkg: any): Promise<T> {
         let packageName = "";
@@ -31,20 +31,22 @@ export class NodeCodeLoader {
         } else {
             packageName = `${pkg.package.name}@${pkg.package.version}`;
         }
-        const codeEntrypoint = await this.installOrWaitForPackages(packageName);
+        console.log(packageName);
+        const codeEntrypoint = "@fluid-example/task-controller"; // await this.installOrWaitForPackages(packageName);
         const entry = import(codeEntrypoint);
         return entry;
     }
 
-    private async installOrWaitForPackages(pkg: string): Promise<string> {
+    public async installOrWaitForPackages(pkg: string): Promise<string> {
         // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
-        const fluidObjects = pkg.match(/(.*)\/(.*)@(.*)/);
+        const components = pkg.match(/(.*)\/(.*)@(.*)/);
         // eslint-disable-next-line no-null/no-null
-        if (fluidObjects === null) {
+        if (components === null) {
             return Promise.reject("Invalid package");
         }
-        const [, scope, name] = fluidObjects;
+        const [, scope, name] = components;
 
+        //      const packageDirectory = `${this.packageDirectory}/${pkg}`;
         const packageDirectory = `${this.packageDirectory}/${pkg}`;
         const signalPath = `${packageDirectory}/${signalFileName}`;
         const codeEntrypoint = `${packageDirectory}/node_modules/${scope}/${name}`;
@@ -55,9 +57,12 @@ export class NodeCodeLoader {
 
             // Copy over the root .npmrc (if present) to the directory where npm install will be executed.
             if (fs.existsSync(`${this.packageDirectory}/.npmrc`)) {
-                fs.copyFileSync(`${this.packageDirectory}/.npmrc`, `${packageDirectory}/.npmrc`);
+                fs.copyFileSync(
+                    `${this.packageDirectory}/.npmrc`,
+                    `${packageDirectory}/.npmrc`,
+                );
             }
-
+            console.log("file copied ..........................");
             // Run npm install
             await asyncExec(`npm install ${pkg}`, { cwd: packageDirectory });
 
@@ -67,26 +72,39 @@ export class NodeCodeLoader {
             // Return entry point.
             return codeEntrypoint;
         } else {
-            await this.waitForPackageFiles(packageDirectory, signalFileName, this.waitTimeoutMSec);
+            await this.waitForPackageFiles(
+                packageDirectory,
+                signalFileName,
+                this.waitTimeoutMSec,
+            );
             return codeEntrypoint;
         }
     }
 
     // A timeout based watcher that looks for dummy file creation.
-    private async waitForPackageFiles(targetDirectory: string, fileName: string, waitTimeout: number): Promise<void> {
+    private async waitForPackageFiles(
+        targetDirectory: string,
+        fileName: string,
+        waitTimeout: number,
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const watcher = fs.watch(targetDirectory, (eventType, newFileName) => {
-                if (eventType === "rename" && newFileName === fileName) {
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    clearTimeout(waitTimer);
-                    watcher.close();
-                    resolve();
-                }
-            });
+            const watcher = fs.watch(
+                targetDirectory,
+                (eventType, newFileName) => {
+                    if (eventType === "rename" && newFileName === fileName) {
+                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                        clearTimeout(waitTimer);
+                        watcher.close();
+                        resolve();
+                    }
+                },
+            );
             const waitTimer = setTimeout(() => {
                 watcher.close();
                 clearTimeout(waitTimer);
-                reject(`${fileName} in ${targetDirectory} was not generated within ${waitTimeout} msecs`);
+                reject(
+                    `${fileName} in ${targetDirectory} was not generated within ${waitTimeout} msecs`,
+                );
             }, waitTimeout);
 
             if (fs.existsSync(`${targetDirectory}/${fileName}`)) {

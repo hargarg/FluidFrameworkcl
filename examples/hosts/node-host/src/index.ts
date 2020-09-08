@@ -4,7 +4,10 @@
  */
 
 import * as url from "url";
-import { IFluidCodeDetails, IProxyLoaderFactory } from "@fluidframework/container-definitions";
+import {
+    IFluidCodeDetails,
+    IProxyLoaderFactory,
+} from "@fluidframework/container-definitions";
 import { Loader } from "@fluidframework/container-loader";
 import { IFluidResolvedUrl } from "@fluidframework/driver-definitions";
 import { IUser } from "@fluidframework/protocol-definitions";
@@ -16,25 +19,25 @@ import { NodeCodeLoader } from "./nodeCodeloader";
 import { fetchFluidObject, initializeChaincode } from "./utils";
 
 // Base service configuration.
-const ordererEndpoint = "";
-const storageEndpoint = "";
-const tenantId = "";
-const tenantKey = "";
-const bearerSecret = "";
+const ordererEndpoint = "https://alfred.frs.office-int.com";
+const storageEndpoint = "https://historian.frs.office-int.com";
+const tenantId = "aquamarinedolphin-hiss";
+const tenantKey = "b1d16a5deff49b8806936a3778377a70";
+const bearerSecret = "VBQyoGpEYrTn3XQPtXW3K8fFDd";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Code package details.
-const defaultPackage = "@fluid-example/key-value-cache@0.19.0-28557";
+const defaultPackage = "@fluid-example/task-controller@0.26.0";
 const installPath = "/tmp/fluid-objects";
 const timeoutMS = 60000;
 
 // Document id (randomly chosen if not specified)
-const docId = "";
+const docId = "78391a8b-463b-4b45-b2b0-9b064ccd0265";
 
 // User information.
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const user = {
-    id: "node-user",         // Required value
-    name: "Node User",       // Optional value that we included
+    id: "16d97a2b-b1e7-4ddf-a203-0d0ccf040b84",
 } as IUser;
 
 export async function start(): Promise<void> {
@@ -45,7 +48,8 @@ export async function start(): Promise<void> {
         {
             user,
         },
-        bearerSecret);
+        bearerSecret,
+    );
     const token = jwt.sign(
         {
             documentId,
@@ -53,12 +57,15 @@ export async function start(): Promise<void> {
             tenantId,
             user,
         },
-        tenantKey);
+        tenantKey,
+    );
 
     // Genearting Fluid urls.
     const encodedTenantId = encodeURIComponent(tenantId);
     const encodedDocId = encodeURIComponent(documentId);
-    const documentUrl = `fluid://${url.parse(ordererEndpoint).host}/${encodedTenantId}/${encodedDocId}`;
+    const documentUrl = `fluid://${
+        url.parse(ordererEndpoint).host
+        }/${encodedTenantId}/${encodedDocId}`;
     const deltaStorageUrl = `${ordererEndpoint}/deltas/${encodedTenantId}/${encodedDocId}`;
     const storageUrl = `${storageEndpoint}/repos/${encodedTenantId}`;
 
@@ -77,7 +84,8 @@ export async function start(): Promise<void> {
     const resolver = new ContainerUrlResolver(
         ordererEndpoint,
         hostToken,
-        new Map([[documentUrl, resolved]]));
+        new Map([[documentUrl, resolved]]),
+    );
 
     // A code loader that installs the code package in a specified location (installPath).
     // Once installed, the loader returns an entry point to Fluid Container to invoke the code.
@@ -107,8 +115,9 @@ export async function start(): Promise<void> {
             package: defaultPackage,
         };
 
-        await initializeChaincode(fluidDocument, details)
-            .catch((error) => console.error("chaincode error", error));
+        await initializeChaincode(fluidDocument, details).catch((error) =>
+            console.error("chaincode error", error),
+        );
     }
 }
 

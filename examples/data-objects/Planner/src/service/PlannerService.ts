@@ -2,7 +2,7 @@ import { ITelemetryBaseLogger } from "@fluidframework/common-definitions";
 import * as uuid from "uuid/v4";
 import * as qs from "querystring";
 import axios from "axios";
-import { graphFetch } from "../utils/graph/graph";
+import { graphFetch } from "../../utils/graph/graph";
 
 interface Entity {
     id: string;
@@ -91,7 +91,7 @@ export class PlannerService {
                 .then((logger: ITelemetryBaseLogger | undefined) => {
                     this.logger = logger;
                 })
-                .catch(() => {});
+                .catch(() => { });
         }
     }
 
@@ -718,12 +718,12 @@ export class PlannerService {
         }
         const assignee = Array.isArray(task.assignee)
             ? task.assignee.reduce((map, obj) => {
-                  map[obj] = {
-                      "@odata.type": "#microsoft.graph.plannerAssignment",
-                      orderHint: task.orderHint ? task.orderHint : " !",
-                  };
-                  return map;
-              }, {})
+                map[obj] = {
+                    "@odata.type": "#microsoft.graph.plannerAssignment",
+                    orderHint: task.orderHint ? task.orderHint : " !",
+                };
+                return map;
+            }, {})
             : {};
         const data = {
             planId: task.planId,
@@ -759,19 +759,19 @@ export class PlannerService {
         const graphUrl = `planner/tasks/${taskId}`;
         let assignee = Array.isArray(task.assignee)
             ? task.assignee.reduce((map, obj) => {
-                  map[obj] = {
-                      "@odata.type": "#microsoft.graph.plannerAssignment",
-                      orderHint: task.orderHint ? task.orderHint : " !",
-                  };
-                  return map;
-              }, {})
+                map[obj] = {
+                    "@odata.type": "#microsoft.graph.plannerAssignment",
+                    orderHint: task.orderHint ? task.orderHint : " !",
+                };
+                return map;
+            }, {})
             : {};
         if (removeAssignee && removeAssignee.length > 0) {
             const removeAssigneeMap = removeAssignee
                 ? removeAssignee.reduce((map: any, obj) => {
-                      map[obj] = null;
-                      return map;
-                  }, {})
+                    map[obj] = null;
+                    return map;
+                }, {})
                 : {};
             assignee = { ...assignee, ...removeAssigneeMap };
         }

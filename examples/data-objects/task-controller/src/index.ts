@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { DataObjectFactory } from "@fluidframework/aqueduct";
+import { DataObjectFactory, ContainerRuntimeFactoryWithDefaultDataStore } from "@fluidframework/aqueduct";
 import { ListComponentName } from "@fluid-example/listexternal";
 import { MainController } from "./model";
 import { ViewControllerType } from "./componentTypes";
@@ -19,8 +19,13 @@ export const ClickerInstantiationFactory = new DataObjectFactory(
     [],
     {},
     [
-        [ViewControllerType, getViewControllerPromise().then((m) =>m.getFactory())],
+        [ViewControllerType, getViewControllerPromise().then((m) => m.getFactory())],
         [ListComponentName, import("@fluid-example/listexternal").then((m) => m.ListComponent.getFactory())],
     ],
 );
-export const fluidExport = ClickerInstantiationFactory;
+export const fluidExport = new ContainerRuntimeFactoryWithDefaultDataStore(
+    controllerName,
+    new Map([
+        [controllerName, Promise.resolve(ClickerInstantiationFactory)],
+    ]),
+);

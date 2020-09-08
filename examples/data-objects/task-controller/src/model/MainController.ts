@@ -31,6 +31,7 @@ export class MainController extends DataObject implements IFluidHTMLView {
         this.listComponent.insertValueInList("firstList", "firstKey", "firstValue");
         this.viewController = await this.root.get<IFluidHandle<ViewController>>(viewControllerKey).get();
         console.log(this.viewController);
+        console.log("--------------------------initialized---------------");
     }
 
     render(elm: HTMLElement, options?: import("@fluidframework/view-interfaces").IFluidHTMLOptions | undefined): void {

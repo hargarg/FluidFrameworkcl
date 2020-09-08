@@ -34,6 +34,7 @@ export async function initializeChaincode(document: Container, pkg?: IFluidCodeD
  * fetchCore is used to make a request against the loader to load a Fluid object.
  */
 async function fetchCore(loader: Loader, url: string) {
+    console.log(url);
     const response = await loader.request({ url });
 
     if (response.status !== 200 || response.mimeType !== "fluid/object") {

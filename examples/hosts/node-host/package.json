@@ -32,6 +32,7 @@
     "@fluidframework/routerlicious-driver": "^0.27.0",
     "@fluidframework/routerlicious-host": "^0.27.0",
     "jsonwebtoken": "^8.4.0",
+    "@fluid-example/task-controller": "^0.26.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

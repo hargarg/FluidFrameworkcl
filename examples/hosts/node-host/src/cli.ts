@@ -4,8 +4,7 @@
  */
 
 import * as readline from "readline";
-import { IKeyValue } from "@fluid-example/key-value-cache";
-import { IFluidObject } from "@fluidframework/core-interfaces";
+// import { IFluidObject } from "@fluidframework/core-interfaces";
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<string> {
@@ -17,16 +16,18 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
 /**
  * A simple command line utility to interact with the key-value-cache fluidObject.
  */
-export async function launchCLI(fluidObject: IFluidObject) {
-    const keyValue: IKeyValue | undefined = fluidObject.IKeyValue;
-    if (keyValue === undefined) {
+export async function launchCLI(fluidObject: any) {
+    console.log(fluidObject.listComponent.getList("cossol"));
+    console.log("in the launch cli");
+    const taskList = fluidObject.listComponent;
+    if (taskList === undefined) {
         return;
     }
     console.log("");
     console.log("Begin entering options (ctrl+c to quit)");
-    console.log("Type '1' to insert a key and value");
-    console.log("Type '2' to get a value for a key");
-    console.log("Type '3' to display all key value pairs");
+    console.log("Type '1' to Create a List");
+    console.log("Type '2' to Insert key and Value in list");
+    console.log("Type '3' to display all key value in list");
     console.log("");
 
     const input = readline.createInterface(process.stdin, process.stdout);
@@ -36,25 +37,23 @@ export async function launchCLI(fluidObject: IFluidObject) {
         const option = await readlineAsync(input, "Option: ");
         if (option === "1") {
             console.log("");
-            const inputKey = await readlineAsync(input, "Enter Key: ");
-            const inputVal = await readlineAsync(input, "Enter Value: ");
-            keyValue.set(inputKey, inputVal);
+            const inputKey = await readlineAsync(input, "Enter ListId: ");
+            taskList.createList(inputKey);
             console.log("");
         } else if (option === "2") {
             console.log("");
+            const listId = await readlineAsync(input, "Enter ListId: ");
             const inputKey = await readlineAsync(input, "Enter Key: ");
-            console.log(`${inputKey}: ${keyValue.get(inputKey)}`);
+            const inputvalue = await readlineAsync(input, "Enter value: ");
+            taskList.insertValueInList(listId, inputKey, inputvalue)
+            console.log(`${inputKey}: ${taskList.getKeyValueInList(listId, inputKey)}`);
             console.log("");
         } else if (option === "3") {
             console.log("");
-            const entries = [...keyValue.entries()];
-            if (entries.length === 0) {
-                console.log("Cache is empty");
-            } else {
-                for (const item of entries) {
-                    console.log(`${item[0]}: ${item[1]}`);
-                }
-            }
+            console.log(taskList.getAllLists().subdirectories());
+            const entries = taskList.getAllLists().entries();
+            console.log(entries);
+
             console.log("");
         } else {
             console.log("Invalid option");
