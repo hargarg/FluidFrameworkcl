@@ -17,9 +17,9 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
  * A simple command line utility to interact with the key-value-cache fluidObject.
  */
 export async function launchCLI(fluidObject: any) {
-    console.log(fluidObject.listComponent.getList("cossol"));
+    console.log(fluidObject.getList("cossol"));
     console.log("in the launch cli");
-    const taskList = fluidObject.listComponent;
+    const taskList = fluidObject;
     if (taskList === undefined) {
         return;
     }
@@ -45,7 +45,7 @@ export async function launchCLI(fluidObject: any) {
             const listId = await readlineAsync(input, "Enter ListId: ");
             const inputKey = await readlineAsync(input, "Enter Key: ");
             const inputvalue = await readlineAsync(input, "Enter value: ");
-            taskList.insertValueInList(listId, inputKey, inputvalue)
+            taskList.insertValueInList(listId, inputKey, inputvalue);
             console.log(`${inputKey}: ${taskList.getKeyValueInList(listId, inputKey)}`);
             console.log("");
         } else if (option === "3") {
@@ -53,8 +53,6 @@ export async function launchCLI(fluidObject: any) {
             console.log(taskList.getAllLists().subdirectories());
             const entries = taskList.getAllLists().entries();
             console.log(entries);
-
-            console.log("");
         } else {
             console.log("Invalid option");
         }
