@@ -5,9 +5,7 @@
 
 import { DataObjectFactory, ContainerRuntimeFactoryWithDefaultDataStore } from "@fluidframework/aqueduct";
 import { ListComponentName } from "@fluid-example/listexternal";
-import { MainController } from "./model";
-import { ViewControllerType } from "./componentTypes";
-import { getViewControllerPromise } from "./view";
+import { Controller } from "./model";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
@@ -15,11 +13,10 @@ export const controllerName = pkg.name as string;
 
 export const ClickerInstantiationFactory = new DataObjectFactory(
     controllerName,
-    MainController,
+    Controller,
     [],
     {},
     [
-        [ViewControllerType, getViewControllerPromise().then((m) => m.getFactory())],
         [ListComponentName, import("@fluid-example/listexternal").then((m) => m.ListComponent.getFactory())],
     ],
 );
