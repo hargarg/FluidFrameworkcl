@@ -58,6 +58,7 @@ export class ListComponent extends DataObject {
         if (this.lists !== undefined) {
             this.lists.on("valueChanged", (changed: IDirectoryValueChanged) => {
                 console.log("changed", changed);
+                this.emit("valueChanged");
             });
             return "cool";
         }
