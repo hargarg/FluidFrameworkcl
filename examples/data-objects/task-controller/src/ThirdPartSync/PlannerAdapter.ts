@@ -189,7 +189,7 @@ export const addTaskDetailsToPlannerTaskStore = async (
   return { ...task, description: taskDetails.description, taskDetailsEtag: taskDetails.etag };
 };
 
-export const handleDescription = async () => {};
+export const handleDescription = async () => { };
 
 export const UpdateTaskStoreMapForTask = async (
   taskId: string,
@@ -235,7 +235,7 @@ export const getTaskStoreMap = async (taskId: string, plannerStore: PlannerStore
 
 export const identifyAssignee = async (task: Task, plannerStore: PlannerStore) => {
   let storeAssignee = plannerStore.getTaskStoreMap(task.id)!.assignee!;
-  let assigneeToBeRemoved = [];
+  let assigneeToBeRemoved: any = [];
   let newAssignee = task.assignee ? task.assignee : [];
   assigneeToBeRemoved = storeAssignee.filter((user) => !newAssignee.includes(user));
   return assigneeToBeRemoved ? assigneeToBeRemoved : [];

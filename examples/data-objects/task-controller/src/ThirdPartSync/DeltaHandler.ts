@@ -101,7 +101,7 @@ export class DeltaHandler {
   }
 
   private mergeInsertAndUpdate(insertedOps: Array<Partial<Task>>, updatedops: Array<Partial<Task>>, uniqueid: string) {
-    let filterdUpdated = [];
+    let filterdUpdated: any = [];
     for (let index in updatedops) {
       let insertIndex = insertedOps.findIndex((el) => el[uniqueid] === updatedops[index][uniqueid]);
       if (

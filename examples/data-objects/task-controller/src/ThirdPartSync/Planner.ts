@@ -54,6 +54,7 @@ export class Planner implements TaskDataSync {
     private tokenProvider: any | undefined,
     readonly loggerPromise: Promise<ITelemetryBaseLogger | undefined>
   ) {
+    console.log(loggerPromise)
     loggerPromise
       .then((logger) => {
         this.logger = logger;

@@ -65,8 +65,8 @@ export class ListComponent extends DataObject {
     /**
      *
      */
-    public getAllListItems(): SharedDirectory | undefined {
-        return this.lists;
+    public getAllListItems() {
+        return this.lists?.entries();
     }
 
     /**
@@ -76,9 +76,12 @@ export class ListComponent extends DataObject {
     public createListItem(listId?: string) {
         this.emit("createdList", listId);
         if (listId !== undefined) {
-            return this.lists?.createSubDirectory(listId);
+            this.lists?.createSubDirectory(listId);
+            return listId;
         } else {
-            return this.lists?.createSubDirectory(uuid());
+            const id = uuid();
+            this.lists?.createSubDirectory(id);
+            return id;
         }
     }
 

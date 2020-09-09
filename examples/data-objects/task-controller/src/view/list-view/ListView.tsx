@@ -83,7 +83,7 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
   private readonly onCardAdd = (newData: any) => {
     console.log(newData);
     const dataModel = this.props.dataModel;
-    const id = uuid();
+
     dataModel?.createListItem(id);
     dataModel?.insertValueInListItem(id, "title", newData.title);
   };

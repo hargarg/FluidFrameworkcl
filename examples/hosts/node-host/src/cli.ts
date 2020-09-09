@@ -19,7 +19,7 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
 export async function launchCLI(fluidObject: any) {
     console.log(fluidObject);
     console.log("in the launch cli");
-    const taskList = fluidObject;
+    const taskList = fluidObject.dataModel;
     if (taskList === undefined) {
         return;
     }
@@ -38,7 +38,7 @@ export async function launchCLI(fluidObject: any) {
         if (option === "1") {
             console.log("");
             const inputKey = await readlineAsync(input, "Enter ListId: ");
-            taskList.createList(inputKey);
+            console.log(taskList.createListItem(inputKey));
             console.log("");
         } else if (option === "2") {
             console.log("");

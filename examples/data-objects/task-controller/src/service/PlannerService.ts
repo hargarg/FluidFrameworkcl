@@ -1,8 +1,9 @@
 import { ITelemetryBaseLogger } from "@fluidframework/common-definitions";
-import * as uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import * as qs from "querystring";
 import axios from "axios";
-import { graphFetch } from "../../utils/graph/graph";
+import { graphFetch } from "../utils/graph/graph";
+import { constantBackoff, whitelist } from "../utils/fetch";
 
 interface Entity {
     id: string;
