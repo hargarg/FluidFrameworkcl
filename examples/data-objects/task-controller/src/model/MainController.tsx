@@ -1,25 +1,27 @@
 /* eslint eslint-comments/no-unlimited-disable: error */
-
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { DataObject } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { ListComponent } from "@fluid-example/listexternal";
 import { IFluidHTMLView } from "@fluidframework/view-interfaces";
 import { IDirectory } from "@fluidframework/map";
-import { ListView, ViewCallbacks } from "../view";
+import { isWebClient } from "../utils/environment";
+import {Planner} from "../ThirdPartSync/Planner";
+import {Bridge} from "../ThirdPartSync/Bridge";
 
 const listComponentKey = "listComponent";
 const viewModelKey = "viewModel";
-
-export class Controller extends DataObject implements IFluidHTMLView, ViewCallbacks {
+let ListView;
+let ReactDOM;
+let React;
+export class Controller extends DataObject implements IFluidHTMLView {
     public get IFluidHTMLView() {
         return this;
     }
 
     public dataModel: ListComponent | undefined;
     public viewModel: IDirectory | undefined;
-
+    public planner: any;
+    public plannerBridge: any;
     protected async initializingFirstTime() {
         const listComponent = await ListComponent.getFactory().createChildInstance(
             this.context,
@@ -30,11 +32,32 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewCallba
 
     protected async hasInitialized() {
         this.dataModel = await this.root.get<IFluidHandle<ListComponent>>(listComponentKey).get();
-        console.log(this.dataModel);
-        this.dataModel.createListItem("firstList");
-        console.log(this.dataModel.getAllListItems());
-        this.dataModel.insertValueInListItem("firstList", "firstKey", "firstValue");
+        // console.log(this.dataModel);
+        // this.dataModel.createListItem("firstList");
+        // console.log(this.dataModel.getAllListItems());
+        // this.dataModel.insertValueInListItem("firstList", "firstKey", "firstValue");
+        if (isWebClient()) {
+            ReactDOM = await import("react-dom");
+            React = await import("react");
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            ListView =  await require("../view").ListView;
+            this.initiateCallbacks();
+
+        }else{
+            this.initiateCallbacks();
+        }
     }
+
+    private initiateCallbacks (){
+        this.dataModel?.on("listChanged", (changed) => {
+            console.log(changed, "in controollr");
+            //this.convertDataModel();
+          })
+          this.planner = new Planner(undefined, undefined);
+          this.plannerBridge = new Bridge(this.planner, 5000);
+    }
+        
+    
 
     public methodName() {
         console.log("method Name");
@@ -46,12 +69,10 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewCallba
         }
     }
 
-    render(elm: HTMLElement, options?: import("@fluidframework/view-interfaces").IFluidHTMLOptions | undefined): void {
-        ReactDOM.render(
-            <ListView
-                dataModel={this.dataModel}
-                viewModel={this.viewModel}
-                callbacks={this} />,
-            elm);
+    render(elm: HTMLElement) {
+        if (isWebClient()) {
+            ReactDOM.render(<ListView dataModel={this.dataModel} viewModel={this.viewModel} />, elm);
+        }
+        return elm;
     }
 }

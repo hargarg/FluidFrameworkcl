@@ -1,5 +1,4 @@
 import * as React from "react";
-import { IValueChanged } from "@fluidframework/map";
 import Board from "react-trello";
 
 import { ViewProps } from "../index";
@@ -19,36 +18,15 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
       },
     };
   }
-  private readonly handleDataModelChange = (valueChanged: IValueChanged) => {
-    const data: any = {
-      lanes: [
-        {
-          id: "lane1",
-          title: "Planned Tasks",
-          label: "2/2",
-          cards: [
-            // { id: "Card1", title: "Write Blog",
-            // description: "Can AI make memes", label: "30 mins", draggable: false },
-            // { id: "Card2", title: "Pay Rent",
-            // description: "Transfer via NEFT", label: "5 mins", metadata: { sha: "be312a1" } },
-          ],
-        },
-      ],
-      editable: true,
-    };
-    const dataModel = this.props.dataModel;
-    const lists = dataModel?.getAllListItems();
-    if (lists) {
-      for (let [key, value] of lists) {
-        console.log(key, value);
-        data.lanes[0].cards.push({
-          title: value.get("title"),
-        });
-      }
-      this.setState({ boardData: data });
-    }
-  };
 
+  componentDidMount(){
+    this.convertDataModel();
+    this.props.dataModel?.on("listChanged", (changed) => {
+      console.log(changed);
+      this.convertDataModel();
+
+    })
+  }
   private readonly convertDataModel = () => {
     const data: any = {
       lanes: [
@@ -69,10 +47,11 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     const dataModel = this.props.dataModel;
     const lists = dataModel?.getAllListItems();
     if (lists) {
-      for (let [key, value] of lists) {
-        console.log(key, value);
+      for (let i in lists){
+        //console.log(key, value);
         data.lanes[0].cards.push({
-          title: value.get("title"),
+          title: lists[i]["title"],
+          id: i
         });
       }
     }
@@ -87,7 +66,7 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     console.log(newData);
     const dataModel = this.props.dataModel;
 
-    let id = dataModel?.createListItem();
+    let id = dataModel?.createListItem(); 
     if (id) {
       dataModel?.insertValueInListItem(id, "title", newData.title);
     }
@@ -99,8 +78,6 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
 
   private readonly onCardMoveAcrossLanes = (newData: any) => {
     console.log(newData);
-    console.log(this.handleDataModelChange);
-    console.log(this.convertDataModel);
   };
 
   // private readonly setEventBus = (handle) => {

@@ -1,16 +1,16 @@
 import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
 import { IFluidHTMLView } from "@fluidframework/view-interfaces";
-// import * as ReactDOM from "react-dom";
-// import * as React from "react";
 import { SharedDirectory } from "@fluidframework/map";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { ListComponent } from "@fluid-example/listexternal";
 import { ViewControllerType } from "../componentTypes";
-// import { ListView } from "./list-view";
+import { isWebClient } from "../utils/environment";
 
 const viewModelKey = "viewModel";
 const dataModelKey = "dataModel";
-
+let ListView;
+let ReactDOM;
+let React;
 export interface ViewProps {
     model: {
         viewModel: SharedDirectory | undefined;
@@ -50,14 +50,22 @@ export class ViewController extends DataObject implements IFluidHTMLView {
         this.viewModel = await viewModelhandle.get();
         const dataModel = this.root.get<IFluidHandle<ListComponent>>(dataModelKey);
         this.dataModel = await dataModel.get();
+        if (isWebClient()) {
+            ReactDOM = await import("react-dom");
+            React = await import("react");
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            ListView =  await require("./list-view").ListView;
+        }
     }
 
     public render(div: HTMLElement) {
-        // const model = {
-        //     viewModel: this.viewModel,
-        //     dataModel: this.dataModel,
-        // };
-        // ReactDOM.render(<ListView model={model} />, div);
+        if (isWebClient()) {
+            const model = {
+                viewModel: this.viewModel,
+                dataModel: this.dataModel,
+            };
+            ReactDOM.render(<ListView model={model} />, div);
+        }
         return div;
     }
 }

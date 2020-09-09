@@ -52,11 +52,10 @@ export class Planner implements TaskDataSync {
 
   constructor(
     private tokenProvider: any | undefined,
-    readonly loggerPromise: Promise<ITelemetryBaseLogger | undefined>
+    readonly loggerPromise: Promise<ITelemetryBaseLogger | undefined> | undefined
   ) {
     console.log(this.logger);
-    loggerPromise
-      .then((logger) => {
+    loggerPromise?.then((logger) => {
         this.logger = logger;
       })
       .catch(() => { });

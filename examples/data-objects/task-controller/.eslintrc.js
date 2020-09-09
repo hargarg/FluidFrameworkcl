@@ -9,6 +9,7 @@ module.exports = {
         "@fluidframework/eslint-config-fluid"
     ],
     "rules": {
-        "strict": "off"
+        "strict": "off",
+        "import/no-internal-modules": "off"
     }
 }

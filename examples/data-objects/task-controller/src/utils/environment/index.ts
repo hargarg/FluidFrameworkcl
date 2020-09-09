@@ -1,0 +1,1 @@
+export {isWebClient} from './envioronment';
