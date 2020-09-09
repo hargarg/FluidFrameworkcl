@@ -1,7 +1,6 @@
 import * as React from "react";
-import { IValueChanged, SharedDirectory } from "@fluidframework/map";
+import { IValueChanged } from "@fluidframework/map";
 import Board from "react-trello";
-import { v4 as uuid } from "uuid";
 
 import { ViewProps } from "../index";
 
@@ -38,14 +37,16 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
       editable: true,
     };
     const dataModel = this.props.dataModel;
-    const lists: SharedDirectory | undefined = dataModel?.getAllListItems();
-    for (let [key, value] of lists?.subdirectories()!) {
-      console.log(key, value);
-      data.lanes[0].cards.push({
-        title: value.get("title"),
-      });
+    const lists = dataModel?.getAllListItems();
+    if (lists) {
+      for (let [key, value] of lists) {
+        console.log(key, value);
+        data.lanes[0].cards.push({
+          title: value.get("title"),
+        });
+      }
+      this.setState({ boardData: data });
     }
-    this.setState({ boardData: data });
   };
 
   private readonly convertDataModel = () => {
@@ -66,12 +67,14 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
       editable: true,
     };
     const dataModel = this.props.dataModel;
-    const lists: SharedDirectory | undefined = dataModel?.getAllListItems();
-    for (let [key, value] of lists?.subdirectories()!) {
-      console.log(key, value);
-      data.lanes[0].cards.push({
-        title: value.get("title"),
-      });
+    const lists = dataModel?.getAllListItems();
+    if (lists) {
+      for (let [key, value] of lists) {
+        console.log(key, value);
+        data.lanes[0].cards.push({
+          title: value.get("title"),
+        });
+      }
     }
     this.setState({ boardData: data });
   };
@@ -84,8 +87,10 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     console.log(newData);
     const dataModel = this.props.dataModel;
 
-    dataModel?.createListItem(id);
-    dataModel?.insertValueInListItem(id, "title", newData.title);
+    let id = dataModel?.createListItem();
+    if (id) {
+      dataModel?.insertValueInListItem(id, "title", newData.title);
+    }
   };
 
   private readonly onCardDelete = (newData: any) => {

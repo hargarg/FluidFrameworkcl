@@ -50,9 +50,9 @@ export async function launchCLI(fluidObject: any) {
             console.log("");
         } else if (option === "3") {
             console.log("");
-            console.log(taskList.getAllLists().subdirectories());
-            const entries = taskList.getAllLists().entries();
-            console.log(entries);
+            for (let [key, val] of taskList.getAllListItems()) { console.log(key, val) }
+            console.log(taskList.getAllListItems());;
+
         } else {
             console.log("Invalid option");
         }
