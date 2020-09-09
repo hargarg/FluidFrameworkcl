@@ -1,6 +1,8 @@
 import * as React from "react";
 import { IValueChanged, SharedDirectory } from "@fluidframework/map";
 import Board from "react-trello";
+import { v4 as uuid } from "uuid";
+
 import { ViewProps } from "../index";
 
 export interface ListViewState {
@@ -18,22 +20,32 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
       },
     };
   }
-
-  componentDidMount() {
-    console.log("inside view");
-    console.log(this.props);
-    this.registerEventHandlers();
-    this.convertDataModel();
-    // set state here.
-  }
-
-  private readonly registerEventHandlers = () => {
-    this.props.dataModel?.on("valueChanged",
-      (valueChanged: IValueChanged) => this.handleDataModelChange(valueChanged));
-  };
-
   private readonly handleDataModelChange = (valueChanged: IValueChanged) => {
-
+    const data: any = {
+      lanes: [
+        {
+          id: "lane1",
+          title: "Planned Tasks",
+          label: "2/2",
+          cards: [
+            // { id: "Card1", title: "Write Blog",
+            // description: "Can AI make memes", label: "30 mins", draggable: false },
+            // { id: "Card2", title: "Pay Rent",
+            // description: "Transfer via NEFT", label: "5 mins", metadata: { sha: "be312a1" } },
+          ],
+        },
+      ],
+      editable: true,
+    };
+    const dataModel = this.props.dataModel;
+    const lists: SharedDirectory | undefined = dataModel?.getAllListItems();
+    for (let [key, value] of lists?.subdirectories()!) {
+      console.log(key, value);
+      data.lanes[0].cards.push({
+        title: value.get("title"),
+      });
+    }
+    this.setState({ boardData: data });
   };
 
   private readonly convertDataModel = () => {
@@ -44,14 +56,10 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
           title: "Planned Tasks",
           label: "2/2",
           cards: [
-            {
-              id: "Card1", title: "Write Blog",
-              description: "Can AI make memes", label: "30 mins", draggable: false
-            },
-            {
-              id: "Card2", title: "Pay Rent",
-              description: "Transfer via NEFT", label: "5 mins", metadata: { sha: "be312a1" }
-            },
+            // { id: "Card1", title: "Write Blog",
+            // description: "Can AI make memes", label: "30 mins", draggable: false },
+            // { id: "Card2", title: "Pay Rent",
+            // description: "Transfer via NEFT", label: "5 mins", metadata: { sha: "be312a1" } },
           ],
         },
       ],
@@ -59,9 +67,12 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     };
     const dataModel = this.props.dataModel;
     const lists: SharedDirectory | undefined = dataModel?.getAllListItems();
-    lists?.forEach((value: any, key: string) => {
-
-    });
+    for (let [key, value] of lists?.subdirectories()!) {
+      console.log(key, value);
+      data.lanes[0].cards.push({
+        title: value.get("title"),
+      });
+    }
     this.setState({ boardData: data });
   };
 
@@ -71,6 +82,10 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
 
   private readonly onCardAdd = (newData: any) => {
     console.log(newData);
+    const dataModel = this.props.dataModel;
+    const id = uuid();
+    dataModel?.createListItem(id);
+    dataModel?.insertValueInListItem(id, "title", newData.title);
   };
 
   private readonly onCardDelete = (newData: any) => {
@@ -79,6 +94,8 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
 
   private readonly onCardMoveAcrossLanes = (newData: any) => {
     console.log(newData);
+    console.log(this.handleDataModelChange);
+    console.log(this.convertDataModel);
   };
 
   // private readonly setEventBus = (handle) => {

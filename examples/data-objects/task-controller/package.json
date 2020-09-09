@@ -46,7 +46,8 @@
     "@fluidframework/view-interfaces": "^0.27.0",
     "@fluidframework/map": "^0.27.0",
     "@fluid-example/listexternal": "^0.26.0",
-    "react-trello": "^2.2.8"
+    "react-trello": "^2.2.8",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@fluidframework/build-common": "^0.19.2",
