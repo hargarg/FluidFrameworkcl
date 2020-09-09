@@ -32,6 +32,7 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewCallba
         this.dataModel = await this.root.get<IFluidHandle<ListComponent>>(listComponentKey).get();
         console.log(this.dataModel);
         this.dataModel.createListItem("firstList");
+        console.log(this.dataModel.getAllListItems());
         this.dataModel.insertValueInListItem("firstList", "firstKey", "firstValue");
     }
 

@@ -66,7 +66,19 @@ export class ListComponent extends DataObject {
      *
      */
     public getAllListItems() {
-        return this.lists?.entries();
+        const data: any = [];
+        const subdirs = this.lists?.subdirectories();
+        if (subdirs) {
+            for (const [name, subdir] of subdirs) {
+                const item = {};
+                item[name] = [];
+                subdir.forEach((val, key_attr) => {
+                    item[name].push({ key: key_attr, value: val });
+                })
+                data.push(item);
+            }
+        }
+        return data;
     }
 
     /**
@@ -89,7 +101,7 @@ export class ListComponent extends DataObject {
      *
      * @param listId
      */
-    public getListItem(listId: string) {
+    public getListItemDirectory(listId: string) {
         return this.lists?.getSubDirectory(listId);
     }
 

@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+    "ignorePatterns": ["src/cli.ts"],
     "extends": [
         "@fluidframework/eslint-config-fluid"
     ],
