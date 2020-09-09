@@ -57,16 +57,15 @@ export class ListComponent extends DataObject {
     public hasValueChanged() {
         if (this.lists !== undefined) {
             this.lists.on("valueChanged", (changed: IDirectoryValueChanged) => {
-                console.log("changed", changed);
+                this.emit("listChanged", changed);
             });
             return "cool";
         }
     }
-
     /**
      *
      */
-    public getAllLists(): SharedDirectory | undefined {
+    public getAllListItems(): SharedDirectory | undefined {
         return this.lists;
     }
 
@@ -74,7 +73,8 @@ export class ListComponent extends DataObject {
      *
      * @param listId
      */
-    public createList(listId?: string) {
+    public createListItem(listId?: string) {
+        this.emit("createdList", listId);
         if (listId !== undefined) {
             return this.lists?.createSubDirectory(listId);
         } else {
@@ -86,7 +86,7 @@ export class ListComponent extends DataObject {
      *
      * @param listId
      */
-    public getList(listId: string) {
+    public getListItem(listId: string) {
         return this.lists?.getSubDirectory(listId);
     }
 
@@ -96,7 +96,8 @@ export class ListComponent extends DataObject {
      * @param key
      * @param value
      */
-    public insertValueInList(listId: string, key: string, value: any) {
+    public insertValueInListItem(listId: string, key: string, value: any) {
+        this.emit("insertOrUpdateAttribute", listId, key);
         this.lists?.getSubDirectory(listId).set(key, value);
     }
 

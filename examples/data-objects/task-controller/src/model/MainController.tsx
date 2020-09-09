@@ -1,3 +1,5 @@
+/* eslint eslint-comments/no-unlimited-disable: error */
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { DataObject } from "@fluidframework/aqueduct";
@@ -29,12 +31,18 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewCallba
     protected async hasInitialized() {
         this.dataModel = await this.root.get<IFluidHandle<ListComponent>>(listComponentKey).get();
         console.log(this.dataModel);
-        this.dataModel.createList("firstList");
-        this.dataModel.insertValueInList("firstList", "firstKey", "firstValue");
+        this.dataModel.createListItem("firstList");
+        this.dataModel.insertValueInListItem("firstList", "firstKey", "firstValue");
     }
 
     public methodName() {
         console.log("method Name");
+    }
+
+    public createList(newData) {
+        if (this.dataModel !== undefined) {
+            this.dataModel.createListItem(newData)
+        }
     }
 
     render(elm: HTMLElement, options?: import("@fluidframework/view-interfaces").IFluidHTMLOptions | undefined): void {
@@ -42,7 +50,7 @@ export class Controller extends DataObject implements IFluidHTMLView, ViewCallba
             <ListView
                 dataModel={this.dataModel}
                 viewModel={this.viewModel}
-                callbacks={this}/>,
+                callbacks={this} />,
             elm);
     }
 }

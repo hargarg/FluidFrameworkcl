@@ -17,7 +17,7 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
  * A simple command line utility to interact with the key-value-cache fluidObject.
  */
 export async function launchCLI(fluidObject: any) {
-    console.log(fluidObject.getList("cossol"));
+    console.log(fluidObject);
     console.log("in the launch cli");
     const taskList = fluidObject;
     if (taskList === undefined) {
