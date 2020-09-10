@@ -6,7 +6,7 @@
 import { DataObjectFactory, ContainerRuntimeFactoryWithDefaultDataStore } from "@fluidframework/aqueduct";
 import { ListComponentName } from "@fluid-example/listexternal";
 import { Controller } from "./model";
-
+export * from "./service/PlannerService";
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
 export const controllerName = pkg.name as string;

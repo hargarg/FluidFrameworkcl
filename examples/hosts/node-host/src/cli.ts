@@ -5,6 +5,7 @@
 
 import * as readline from "readline";
 // import { IFluidObject } from "@fluidframework/core-interfaces";
+import { PlannerService } from "@fluid-example/task-controller"
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<string> {
@@ -17,7 +18,10 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
  * A simple command line utility to interact with the key-value-cache fluidObject.
  */
 export async function launchCLI(fluidObject: any) {
-    console.log(fluidObject);
+    let x = new PlannerService("a")
+    console.log(x.getMe());
+    console.log(new PlannerService("a"))
+
     console.log("in the launch cli");
     const taskList = fluidObject.dataModel;
     if (taskList === undefined) {
@@ -31,9 +35,15 @@ export async function launchCLI(fluidObject: any) {
     console.log("");
 
     const input = readline.createInterface(process.stdin, process.stdout);
+    // console.log(taskList.createListItem("awss"));
+    // taskList.insertValueInListItem("awss", "firstKey", "firstValue");
+
+    // taskList.on("listChanged", (changed) => { console.log("value is changed:", changed) })
+    // taskList.on("createdList", (list) => console.log("list ", list))
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
+        taskList.on("listChanged", (changed) => { console.log("value is changed:", changed) })
         const option = await readlineAsync(input, "Option: ");
         if (option === "1") {
             console.log("");
@@ -50,7 +60,6 @@ export async function launchCLI(fluidObject: any) {
             console.log("");
         } else if (option === "3") {
             console.log("");
-            for (let [key, val] of taskList.getAllListItems()) { console.log(key, val) }
             console.log(taskList.getAllListItems());;
 
         } else {
