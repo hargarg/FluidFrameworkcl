@@ -19,7 +19,7 @@ async function readlineAsync(input: readline.ReadLine, prompt: string): Promise<
  */
 export async function launchCLI(fluidObject: any) {
     let x = new PlannerService("a")
-    console.log(x.getMe());
+    console.log(await x.getMe());
     console.log(new PlannerService("a"))
 
     console.log("in the launch cli");

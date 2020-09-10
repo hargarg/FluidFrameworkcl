@@ -86,6 +86,7 @@ export class PlannerService {
         private tokenProvider: any,
         private loggerPromise?: Promise<ITelemetryBaseLogger | undefined>
     ) {
+        this.tokenProvider = this.getAuthToken();
         if (this.loggerPromise) {
             this.tokenProvider = this.getAuthToken();
             this.loggerPromise
@@ -97,14 +98,14 @@ export class PlannerService {
     }
 
     public async getAuthToken() {
-        const tenantId = "112b9a0f-232b-4fd9-afff-8a905a467020";
+        const tenantId = "49f3c34f-01fb-4019-b6c0-1e3da13a6a17";
         const tokenUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
         const bodyData = {
             grant_type: "password",
-            client_id: "f416be8a-da8a-4d94-8504-ab1821757ff3",
-            client_secret: "GhurZ0_9S-9W.~NaW-U--za02Em8FCyogE",
+            client_id: "1ec476ca-2b95-4b44-8ea4-c4ab1f17b6d5",
+            client_secret: "99n_xTyeo~FIHGVZal5n0l_E_eJf_e_n9T",
             scope: "https://graph.microsoft.com/.default",
-            username: "harshitgarg@taskfluidtest.onmicrosoft.com",
+            username: "harshitgarg@taskfluidsep.onmicrosoft.com",
             password: "Woku09400",
         };
         const fetchResponse = await axios({
@@ -115,7 +116,6 @@ export class PlannerService {
                 "Content-Type": "application/x-www-form-urlencoded;",
             },
         });
-        console.log(fetchResponse);
         return fetchResponse.data["access_token"];
     }
 
@@ -125,12 +125,14 @@ export class PlannerService {
      */
     public async getMe(): Promise<any | undefined> {
         const graphUrl = `me`;
+        this.tokenProvider = this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
             "getMyprofile",
             this.logger
         );
+        console.log(response);
         if (!this.isReponseValid(response)) {
             return undefined;
         }
@@ -185,6 +187,7 @@ export class PlannerService {
     public async getGroupMembers(
         groupId: string
     ): Promise<People[] | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `groups/${groupId}/members?$select=id,userPrincipalName,displayName`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -214,6 +217,7 @@ export class PlannerService {
     public async getGroupOwners(
         groupId: string
     ): Promise<People[] | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `groups/${groupId}/owners?$select=id,userPrincipalName,displayName`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -240,6 +244,7 @@ export class PlannerService {
      * Returns Information related to a Particular Group
      */
     public async getGroupInfo(groupId: string): Promise<People | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `groups/${groupId}`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -261,6 +266,7 @@ export class PlannerService {
     public async getPlansForGroup(
         GroupId: string
     ): Promise<PlannerPlan[] | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `groups/${GroupId}/planner/plans`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -286,6 +292,7 @@ export class PlannerService {
      */
     public async createPlan(groupId: string, title: string): Promise<Response> {
         const graphUrl = `planner/plans`;
+        this.tokenProvider = await this.getAuthToken();
         const data = {
             owner: groupId,
             title,
@@ -321,6 +328,7 @@ export class PlannerService {
         userId: string
     ): Promise<Response> {
         const graphUrl = `groups/${groupId}/members/$ref`;
+        this.tokenProvider = await this.getAuthToken();
         const userdirectoryurl =
             "https://graph.microsoft.com/v1.0/users/" + userId;
         const data = { "@odata.id": userdirectoryurl };
@@ -346,6 +354,7 @@ export class PlannerService {
      */
     public async createGroup(userId: string, groupName: string) {
         const graphUrl = `groups`;
+        this.tokenProvider = await this.getAuthToken();
         const nickname = `${uuid()}`;
         let data = {
             displayName: groupName,
@@ -386,6 +395,7 @@ export class PlannerService {
      */
     public async getAllTasksForPlan(planId: string) {
         const graphUrl = `planner/plans/${planId}/tasks`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -422,6 +432,7 @@ export class PlannerService {
      */
     public async getAllTasksForBucket(bucketId: string) {
         const graphUrl = `planner/buckets/${bucketId}/tasks`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -456,6 +467,7 @@ export class PlannerService {
      * @param planId
      */
     public async getAllBucketsForPlan(planId: string) {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `planner/plans/${planId}/buckets`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -484,6 +496,7 @@ export class PlannerService {
      * @param taskId
      */
     public async getTask(taskId: string): Promise<PlannerTask | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `planner/tasks/${taskId}`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -518,6 +531,7 @@ export class PlannerService {
      */
     public async getTaskDetails(taskId: string) {
         const graphUrl = `planner/tasks/${taskId}/details`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -544,7 +558,7 @@ export class PlannerService {
     ): Promise<PlannerTaskDetails | Response | undefined> {
         if (!taskdetail) return undefined;
         const graphUrl = `planner/tasks/${taskdetail.id}/details`;
-
+        this.tokenProvider = await this.getAuthToken();
         const data = {
             description: taskdetail.description,
         };
@@ -584,6 +598,7 @@ export class PlannerService {
      */
     public async getPlan(planId: string): Promise<PlannerPlan | undefined> {
         const graphUrl = `/planner/plans/${planId}?select=id,owner,title`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -606,6 +621,7 @@ export class PlannerService {
         planId: string
     ): Promise<PlannerPlanDetails | undefined> {
         const graphUrl = `/planner/plans/${planId}/details`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -632,6 +648,7 @@ export class PlannerService {
         taskId: string
     ): Promise<PlannerTaskFormat | undefined> {
         const graphUrl = `/planner/tasks/${taskId}/bucketTaskBoardFormat`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -668,6 +685,7 @@ export class PlannerService {
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json", "If-Match": etag },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -695,6 +713,7 @@ export class PlannerService {
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json" },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -738,6 +757,7 @@ export class PlannerService {
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json" },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -794,6 +814,7 @@ export class PlannerService {
                 "If-Match": task.etag,
             },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -820,6 +841,7 @@ export class PlannerService {
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json", "If-Match": etag },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -862,6 +884,7 @@ export class PlannerService {
             body: JSON.stringify(data),
             headers: { "Content-Type": "application/json", "If-Match": etag },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -886,6 +909,7 @@ export class PlannerService {
                 "If-Match": task.etag,
             },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -910,6 +934,7 @@ export class PlannerService {
             method: "DELETE",
             headers: { "Content-Type": "application/json", "If-Match": etag },
         } as RequestInit;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -963,6 +988,7 @@ export class PlannerService {
      * @param deltaLink
      */
     public async getPlanDelta(deltaLink: string) {
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             deltaLink,
@@ -982,6 +1008,7 @@ export class PlannerService {
      * @param bucketId
      */
     public async getBucket(bucketId: string) {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `planner/buckets/${bucketId}`;
         const response = await graphFetch(
             this.tokenProvider,

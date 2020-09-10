@@ -3,7 +3,7 @@ import {
     ITelemetryProperties,
 } from "@fluidframework/common-definitions";
 import { delay } from "./delay";
-
+import * as fetch from "node-fetch";
 // TODO: Let's consolidate this module with the similar one in the prague repo for the odsp driver
 
 export interface CachedResult<T> {
@@ -23,7 +23,7 @@ export function asyncWithCache<T>(
 ): () => Promise<T | undefined> {
     let cache: CachedResult<T> | undefined = undefined;
     return () => {
-        const currentTick = performance.now();
+        const currentTick = 2;
 
         if (
             cache === undefined ||
@@ -203,13 +203,13 @@ export function fetchWithRetry(
 ): Promise<FetchWithRetryResponse> {
     return asyncWithRetry<FetchResponse>(
         () => {
-            const startTime = performance.now();
+            const startTime = 2;
             return fetch(requestInfo, requestInit)
                 .then((response) => {
                     // We cannot use the spread syntax here since the response object is non enumerable
                     const fetchResponse = response as FetchResponse;
                     fetchResponse.durationMs = Math.round(
-                        performance.now() - startTime
+                        2 - startTime
                     );
                     return fetchResponse;
                 })
@@ -218,7 +218,7 @@ export function fetchWithRetry(
                     return {
                         status: !window.navigator.onLine ? 706 : -1,
                         ok: false,
-                        durationMs: Math.round(performance.now() - startTime),
+                        durationMs: Math.round(2 - startTime),
                     } as FetchResponse;
                 });
         },
