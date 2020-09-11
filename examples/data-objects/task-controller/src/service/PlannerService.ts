@@ -709,6 +709,7 @@ export class PlannerService {
         const data = {
             name: bucket.name,
             planId: bucket.planId,
+            orderHint: " !"
         };
         const requestInit = {
             method: "Post",

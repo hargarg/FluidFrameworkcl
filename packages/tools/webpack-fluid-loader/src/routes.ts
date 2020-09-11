@@ -17,7 +17,7 @@ import {
 } from "@fluidframework/tool-utils";
 import { IFluidPackage } from "@fluidframework/container-definitions";
 import Axios from "axios";
-import { RouteOptions } from "./loader";
+import { RouteOptions ,start } from "./loader";
 import { createManifestResponse } from "./bohemiaIntercept";
 import { tinyliciousUrls } from "./multiResolver";
 
@@ -224,6 +224,19 @@ export const after = (app: express.Application, server: WebpackDevServer, baseDi
     });
 
     /**
+     * For urls of format - http://localhost:8080/server/<id>.
+     * This is when user is trying to load an existing document on server.
+     * We try to load a Container with `id` as documentId.
+     */
+    app.get("/server/:id*", async (req, res) => {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        const ready = await isReady(req, res);
+        if (ready) {
+            fluidServer(req, res, baseDir, options);
+        }
+    });
+
+    /**
      * For urls of format - http://localhost:8080/<id>.
      * If the `id` is "new" or "manualAttach", the user is trying to create a new document.
      * For other `ids`, we treat this as the user trying to load an existing document. We redirect to
@@ -253,6 +266,25 @@ export const after = (app: express.Application, server: WebpackDevServer, baseDi
     });
 };
 
+const fluidServer = (req: express.Request, res: express.Response, baseDir: string, options: RouteOptions) => {
+    const documentId = req.params.id;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const packageJson = require(path.join(baseDir, "./package.json")) as IFluidPackage;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const main = require(path.join(baseDir, "./dist/main.bundle.js"));
+    let fluidStarted = false;
+
+    start(documentId, packageJson,  main, options, undefined, `${req.protocol}://${req.get("host")}${req.path}`)
+        .then(() => {
+            fluidStarted = true;
+            console.log("loader started", fluidStarted);
+            res.end("success");
+        })
+        .catch((error) => {
+            console.error(error, "error");
+            res.end("failure");
+        });
+};
 const fluid = (req: express.Request, res: express.Response, baseDir: string, options: RouteOptions) => {
     const documentId = req.params.id;
     // eslint-disable-next-line @typescript-eslint/no-require-imports

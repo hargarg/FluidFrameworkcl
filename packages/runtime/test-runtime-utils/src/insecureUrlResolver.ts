@@ -61,7 +61,7 @@ export class InsecureUrlResolver implements IUrlResolver {
 
         // If hosts match then we use the local tenant information. Otherwise we make a REST call out to the hosting
         // service using our bearer token.
-        if (parsedUrl.host === window.location.host) {
+        if (typeof window === "undefined" || parsedUrl.host === window.location.host) {
             const documentId = parsedUrl.pathname.substr(1).split("/")[0];
             return this.resolveHelper(documentId);
         } else {

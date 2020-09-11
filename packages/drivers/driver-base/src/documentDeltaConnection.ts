@@ -83,8 +83,12 @@ export class DocumentDeltaConnection
                 reconnection: false,
                 transports: ["websocket"],
                 timeout: timeoutMs,
+                rejectUnauthorized: false,
+                secure: true,
             });
-
+        socket.on('connect', function() {
+            console.log("shashi join");           
+        });
         const connectMessage: IConnect = {
             client,
             id,

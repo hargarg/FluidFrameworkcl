@@ -7,6 +7,7 @@ import { IDirectory } from "@fluidframework/map";
 import { isWebClient } from "../utils/environment";
 import { Planner } from "../ThirdPartSync/Planner";
 import { Bridge } from "../ThirdPartSync/Bridge";
+import { PlannerConnector } from "./PlannerConnect";
 
 const listComponentKey = "listComponent";
 const viewModelKey = "viewModel";
@@ -41,21 +42,18 @@ export class Controller extends DataObject implements IFluidHTMLView {
             React = await import("react");
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             ListView = await require("../view").ListView;
-            this.initiateCallbacks();
-
         } else {
             this.initiateCallbacks();
         }
     }
 
     private initiateCallbacks() {
-        this.dataModel?.on("listChanged", (changed) => {
-            console.log(changed, "in controollr");
-            //this.convertDataModel();
-        })
+
         this.planner = new Planner(undefined, undefined);
         this.plannerBridge = new Bridge(this.planner, 5000);
+        new PlannerConnector(this.dataModel,this.plannerBridge,this.planner, this.root);
     }
+
 
 
 

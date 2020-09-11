@@ -170,10 +170,11 @@ export async function start(
     fluidModule: IFluidModule,
     options: RouteOptions,
     div: HTMLDivElement,
+    requestURL: string| undefined,
 ): Promise<void> {
     let documentId: string = id;
-    let url = window.location.href;
-
+    let url = typeof window !== "undefined" && typeof window.document !== "undefined"
+    ? window.location.href : requestURL;
     /**
      * For new documents, the `url` is of the format - http://localhost:8080/new or http://localhost:8080/manualAttach.
      * So, we create a new `id` and use that as the `documentId`.
@@ -190,8 +191,8 @@ export async function start(
         package: packageJson,
         config: {},
     };
-
-    let urlResolver = new MultiUrlResolver(documentId, window.location.origin, options);
+    const urlObj = new URL(url);
+    let urlResolver = new MultiUrlResolver(documentId, urlObj.origin, options);
 
     // Create the loader that is used to load the Container.
     let loader1 = await createWebLoader(documentId, fluidModule, options, urlResolver, codeDetails);
@@ -202,7 +203,7 @@ export async function start(
         container1 = await loader1.createDetachedContainer(codeDetails);
     } else {
         // For existing documents, we try to load the container with the given documentId.
-        const documentUrl = `${window.location.origin}/${documentId}`;
+        const documentUrl = `${urlObj.origin}/${documentId}`;
         container1 = await loader1.resolve({ url: documentUrl });
 
         /**
@@ -216,7 +217,7 @@ export async function start(
 
             documentId = moniker.choose();
             url = url.replace(id, documentId);
-            urlResolver = new MultiUrlResolver(documentId, window.location.origin, options);
+            urlResolver = new MultiUrlResolver(documentId, urlObj.origin, options);
             loader1 = await createWebLoader(documentId, fluidModule, options, urlResolver, codeDetails);
             container1 = await loader1.createDetachedContainer(codeDetails);
         }
@@ -226,7 +227,7 @@ export async function start(
     let rightDiv: HTMLDivElement;
 
     // For side by side mode, create two divs.
-    if (options.mode === "local" && !options.single) {
+    if (div && options.mode === "local" && !options.single) {
         div.style.display = "flex";
         leftDiv = makeSideBySideDiv("sbs-left");
         rightDiv = makeSideBySideDiv("sbs-right");

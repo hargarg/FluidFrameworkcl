@@ -46,10 +46,10 @@ export class Planner implements TaskDataSync {
   private plannerService: PlannerService;
   public plannerStore: PlannerStore;
   private deltaService: DeltaHandler | undefined;
-  public syncEnabled: Boolean = false;
+  public syncEnabled: Boolean = true;
   public isPlannerStoreInitialized: Boolean = false;
   private logger: ITelemetryBaseLogger | undefined;
-
+  private countRetry: number = 0;
   constructor(
     private tokenProvider: any | undefined,
     readonly loggerPromise: Promise<ITelemetryBaseLogger | undefined> | undefined
@@ -195,6 +195,9 @@ export class Planner implements TaskDataSync {
 
     const getCurrentUser = await this.plannerService.getMe();
     const groupResponse = await this.plannerService.createGroup(getCurrentUser.id, boardName);
+    if(!groupResponse && this.countRetry++ < 30){
+      return await this.createBoard(boardName);
+    }
     const response = await this.plannerService.createPlan(groupResponse['id'], boardName);
     const data = response.ok ? await response.json() : undefined;
     this.plannerStore.setPlannerPlan({
@@ -221,6 +224,9 @@ export class Planner implements TaskDataSync {
     const plannerBucket: PlannerBucket = { planId: boardId, name, id: '' } as PlannerBucket;
     const response = await this.plannerService.createBucketForPlan(plannerBucket);
     const data = response ? await response.json() : undefined;
+    if(!data && this.countRetry++ < 40){
+      return await this.createBucket(boardId,name);
+    }
     const bucket: Bucket = {
       boardId,
       bucketId: data['id'],

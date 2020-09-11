@@ -85,7 +85,7 @@ export class PlannerService {
         private tokenProvider: any,
         private loggerPromise?: Promise<ITelemetryBaseLogger | undefined>
     ) {
-        if (this.loggerPromise) {
+        if (true) {
             this.tokenProvider = this.getAuthToken();
             this.loggerPromise
                 .then((logger: ITelemetryBaseLogger | undefined) => {
