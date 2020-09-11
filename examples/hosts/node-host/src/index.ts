@@ -32,7 +32,7 @@ const installPath = "/tmp/fluid-objects";
 const timeoutMS = 60000;
 
 // Document id (randomly chosen if not specified)
-const docId = "islandraccoon_lord";
+export const docId = "forestlantern_coyote";
 
 // User information.
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

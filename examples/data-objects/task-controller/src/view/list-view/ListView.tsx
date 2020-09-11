@@ -19,7 +19,7 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.convertDataModel();
     this.props.dataModel?.on("listChanged", (changed) => {
       console.log(changed);
@@ -42,12 +42,13 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
           ],
         },
       ],
+      editLaneTitle: true,
       editable: true,
     };
     const dataModel = this.props.dataModel;
     const lists = dataModel?.getAllListItems();
     if (lists) {
-      for (let i in lists){
+      for (let i in lists) {
         //console.log(key, value);
         data.lanes[0].cards.push({
           title: lists[i]["title"],
@@ -66,7 +67,7 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
     console.log(newData);
     const dataModel = this.props.dataModel;
 
-    let id = dataModel?.createListItem(); 
+    let id = dataModel?.createListItem();
     if (id) {
       dataModel?.insertValueInListItem(id, "title", newData.title);
     }

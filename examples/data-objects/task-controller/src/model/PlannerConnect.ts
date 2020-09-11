@@ -1,127 +1,147 @@
-import {DeltaType} from '../ThirdPartSync/DeltaHandler';
-import {Task} from '../ThirdPartSync/ITaskDataSync';
+import { DeltaType } from '../ThirdPartSync/DeltaHandler';
+import { Task } from '../ThirdPartSync/ITaskDataSync';
 
 export class PlannerConnector {
-private boardId: any;
-public bucketId: any;
-private retryCount: number =0;
-private tasksListMap: any={};
+  private boardId: any;
+  public bucketId: any;
+  private retryCount: number = 0;
+  private tasksListMap: any = {};
   constructor(
     private dataModel: any,
     private Bridge: any,
     private Planner: any,
     private root: any
   ) {
-    console.log(this.Bridge);
-    this.dataModel?.on("listChanged", (changed) => {
-        this.getAllItems();
+
+    this.dataModel?.on("listChanged", async (changed) => {
+      await this.getAllItems();
     });
+    this.dataModel.on("createdList", (changed) => {
+
+    })
     this.getBoardInfo();
 
   }
-  async getBoardInfo(){
+  async getBoardInfo() {
     this.boardId = await this.getBoardId();
     this.bucketId = await this.getBucketId();
     const board: any = {
-        boardId: this.boardId
-      };
+      boardId: this.boardId
+    };
     this.Bridge.startSync(board, this.handleAllUpdatesFromPlanner.bind(this), this.handleDeltaUpdatesFromPlanner.bind(this));
-    this.getAllItems();
-    
-  }
-  async handleAllUpdatesFromPlanner(tasks: Task[]){
-    for (let task of tasks) {
-        let row = this.tasksListMap[task.id];
+    await this.getAllItems();
 
-        if(row){
-            this.dataModel?.insertValueInListItem(row.id, "title", task.taskName);
-        }else{
-            let id = this.dataModel?.createListItem(); 
-            if (id) {
-                this.dataModel?.insertValueInListItem(id, "title", task.taskName);
-                this.dataModel?.insertValueInListItem(id, "plannerTaskId", task.id);
-            }
+  }
+  async handleAllUpdatesFromPlanner(tasks: Task[]) {
+    console.log('handleAllUpdatesFromPlanner............', tasks)
+    for (let task of tasks) {
+      let row = this.tasksListMap[task.id];
+      if (this.ifTaskAlreadyPresent(task)) { continue; }
+      if (row) {
+        this.dataModel?.insertValueInListItem(row.id, "title", task.taskName);
+      } else {
+        let id = this.dataModel?.createListItem();
+        if (id) {
+          this.dataModel?.insertValueInListItem(id, "title", task.taskName);
+          this.dataModel?.insertValueInListItem(id, "plannerTaskId", task.id);
         }
-      
+      }
+
     }
   }
-  async handleDeltaUpdatesFromPlanner(tasks: Task[]){
-
+  async handleDeltaUpdatesFromPlanner(tasks: Task[]) {
+    console.log("handleDeltaUpdatesFromPlanner.....................", tasks)
     for (let task of tasks) {
-        let row = this.tasksListMap[task.id];
-
-      switch(task.type){
+      let row = this.tasksListMap[task.id];
+      if (this.ifTaskAlreadyPresent(task)) { continue; }
+      switch (task.type) {
         case DeltaType.TASK_UPDATE: {
-            this.dataModel?.insertValueInListItem(row.id, "title", task.taskName);
-            break;
-          }
-          case DeltaType.TASK_INSERT: {
-            if(!row){
-            let id = this.dataModel?.createListItem(); 
+          this.dataModel?.insertValueInListItem(row.id, "title", task.taskName);
+          break;
+        }
+        case DeltaType.TASK_INSERT: {
+          if (!row) {
+            let id = this.dataModel?.createListItem();
             if (id) {
-                this.dataModel?.insertValueInListItem(id, "title", task.taskName);
-                this.dataModel?.insertValueInListItem(id, "plannerTaskId", task.id);
-            }}
-            break;
+              this.dataModel?.insertValueInListItem(id, "title", task.taskName);
+              this.dataModel?.insertValueInListItem(id, "plannerTaskId", task.id);
+            }
           }
-          case DeltaType.TASK_DELETE: {
-        //
-          }
-      }
-    }
-  }
-  getAllItems(){
-    const lists = this.dataModel?.getAllListItems();
-    if (lists) {
-      for (let i in lists){
-        //console.log(key, value);
-        if(!lists[i].plannerTaskId){
-            this.createTask(lists[i],i);
-        }else{
-        this.tasksListMap[lists[i].plannerTaskId] ={id: i, value: lists[i]};
+          break;
+        }
+        case DeltaType.TASK_DELETE: {
+          //
         }
       }
     }
   }
-  async createTask(item, id){
+  async getAllItems() {
+    const lists = await this.dataModel?.getAllListItems();
+    if (lists) {
+      for (let i in lists) {
+        //console.log(key, value);
+        if (!lists[i].plannerTaskId) {
+          console.log("create task called")
+          console.log(lists, i)
+          await this.createTask(lists[i], i);
+        } else {
+          this.tasksListMap[lists[i].plannerTaskId] = { id: i, value: lists[i] };
+        }
+      }
+    }
+  }
+
+  async ifTaskAlreadyPresent(task) {
+    const lists = await this.dataModel?.getAllListItems();
+    if (lists) {
+      for (let i in lists) {
+        if (lists[i].plannerTaskId && lists[i].plannerTaskId === task.id) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async createTask(item, id) {
     const plannerTask = await this.Planner.addTask({
-        taskName: item.title,
-        assignee: [],
-        dueDate: undefined,
-        status: undefined,
-        id: "",
-        boardId: this.boardId,
-        bucketId: this.bucketId,
-    },this.bucketId)
-    this.dataModel?.insertValueInListItem(id, "plannerTaskId", plannerTask.id);
-    this.tasksListMap[plannerTask.id] ={id, value: item};
+      taskName: item.title,
+      assignee: [],
+      dueDate: undefined,
+      status: undefined,
+      id: "",
+      boardId: this.boardId,
+      bucketId: this.bucketId,
+    }, this.bucketId)
+    await this.dataModel?.insertValueInListItem(id, "plannerTaskId", plannerTask.id);
+    this.tasksListMap[plannerTask.id] = { id, value: item };
 
   }
-  async  wait(ms) {
+  async wait(ms) {
     return new Promise(resolve => {
       setTimeout(resolve, ms);
     });
   }
-  async getBoardId(){
-      if(this.root.get("boardId")) {
-        return this.root.get("boardId");
-      }
-    
-    const boardName = window.location.pathname.split("/doc/")[1];
-    if(!boardName && this.retryCount++ <30){
-        await this.wait(1000);
-        return await this.getBoardId();
+  async getBoardId() {
+    if (this.root.get("boardId")) {
+      return this.root.get("boardId");
+    }
+    const boardName = this.root.get("boardName");//window.location.pathname.split("/doc/")[1];
+
+    if (!boardName && this.retryCount++ < 30) {
+      await this.wait(1000);
+      return await this.getBoardId();
     }
     const boardId = await this.Planner.createBoard(boardName);
-    this.root.set('boardId',boardId.boardId);
+    this.root.set('boardId', boardId.boardId);
     return boardId.boardId;
   }
-  async getBucketId(){
-    if(this.root.get("bucketId")) {
-        return this.root.get("bucketId");
+  async getBucketId() {
+    if (this.root.get("bucketId")) {
+      return this.root.get("bucketId");
     }
     const bucketId = await this.createBucket(this.boardId);
-    this.root.set('bucketId',bucketId.bucketId);
+    this.root.set('bucketId', bucketId.bucketId);
     this.bucketId = bucketId.bucketId;
     return this.bucketId;
   }

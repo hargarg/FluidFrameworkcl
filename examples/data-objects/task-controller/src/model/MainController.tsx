@@ -47,11 +47,15 @@ export class Controller extends DataObject implements IFluidHTMLView {
         }
     }
 
-    public initiateCallbacks() {
-
+    public initiateCallbacks(boardName?: string) {
+        console.log("//.............................initializecallback............")
+        if (boardName) {
+            this.root.set("boardName", boardName);
+        }
         this.planner = new Planner(undefined, undefined);
         this.plannerBridge = new Bridge(this.planner, 5000);
-        new PlannerConnector(this.dataModel,this.plannerBridge,this.planner, this.root);
+        new PlannerConnector(this.dataModel, this.plannerBridge, this.planner, this.root);
+
     }
 
 
