@@ -125,7 +125,7 @@ export class PlannerService {
      */
     public async getMe(): Promise<any | undefined> {
         const graphUrl = `me`;
-        this.tokenProvider = this.getAuthToken();
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -148,6 +148,7 @@ export class PlannerService {
      * @param userId
      */
     public async getUserFromId(userId: string): Promise<People | undefined> {
+        this.tokenProvider = await this.getAuthToken();
         const graphUrl = `users/${userId}?$select=id,userPrincipalName,displayName`;
         const response = await graphFetch(
             this.tokenProvider,
@@ -167,6 +168,7 @@ export class PlannerService {
      */
     public async getMemberOf(): Promise<People | undefined> {
         const graphUrl = `me/memberOf`;
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
