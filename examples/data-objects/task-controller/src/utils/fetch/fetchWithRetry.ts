@@ -3,7 +3,7 @@ import {
     ITelemetryProperties,
 } from "@fluidframework/common-definitions";
 import { delay } from "./delay";
-import * as fetch from "node-fetch";
+//import * as fetch from "node-fetch";
 // TODO: Let's consolidate this module with the similar one in the prague repo for the odsp driver
 
 export interface CachedResult<T> {

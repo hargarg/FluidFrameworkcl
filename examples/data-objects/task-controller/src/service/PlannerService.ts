@@ -125,7 +125,7 @@ export class PlannerService {
      */
     public async getMe(): Promise<any | undefined> {
         const graphUrl = `me`;
-        this.tokenProvider = this.getAuthToken();
+        this.tokenProvider = await this.getAuthToken();
         const response = await graphFetch(
             this.tokenProvider,
             graphUrl,
@@ -707,6 +707,7 @@ export class PlannerService {
         const data = {
             name: bucket.name,
             planId: bucket.planId,
+            orderHint: " !"
         };
         const requestInit = {
             method: "Post",

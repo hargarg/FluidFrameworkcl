@@ -32,8 +32,8 @@ export class ListView extends React.Component<ViewProps, ListViewState> {
       lanes: [
         {
           id: "lane1",
-          title: "Planned Tasks",
-          label: "2/2",
+          title: "First List",
+          label: "",
           cards: [
             // { id: "Card1", title: "Write Blog",
             // description: "Can AI make memes", label: "30 mins", draggable: false },
