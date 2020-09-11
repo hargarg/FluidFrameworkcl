@@ -21,7 +21,7 @@ export async function launchCLI(fluidObject: any) {
     let x = new PlannerService("a")
     console.log(await x.getMe());
     console.log(new PlannerService("a"))
-
+    console.log(fluidObject.initiateCallbacks());
     console.log("in the launch cli");
     const taskList = fluidObject.dataModel;
     if (taskList === undefined) {
