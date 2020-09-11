@@ -47,7 +47,7 @@ export class Controller extends DataObject implements IFluidHTMLView {
         }
     }
 
-    private initiateCallbacks() {
+    public initiateCallbacks() {
 
         this.planner = new Planner(undefined, undefined);
         this.plannerBridge = new Bridge(this.planner, 5000);
