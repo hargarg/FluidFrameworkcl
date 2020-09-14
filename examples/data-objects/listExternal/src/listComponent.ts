@@ -59,7 +59,7 @@ export class ListComponent extends DataObject {
             this.lists.on("valueChanged", (changed: IDirectoryValueChanged) => {
                 this.emit("listChanged", changed);
             });
-            return "cool";
+
         }
     }
     /**
@@ -121,6 +121,14 @@ export class ListComponent extends DataObject {
      */
     public getKeyValueInList(listId: string, key: string) {
         this.lists?.getSubDirectory(listId).get(key);
+    }
+
+    public deleteListItem(listId: string) {
+        this.lists?.deleteSubDirectory(listId);
+    }
+
+    public deleteListItemAttribute(listId: string, key: string) {
+        this.lists?.getSubDirectory(listId).delete(key);
     }
 
     public async request(request: IRequest): Promise<IResponse> {
