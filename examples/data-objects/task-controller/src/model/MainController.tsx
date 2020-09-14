@@ -42,8 +42,6 @@ export class Controller extends DataObject implements IFluidHTMLView {
             React = await import("react");
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             ListView = await require("../view").ListView;
-        } else {
-            this.initiateCallbacks();
         }
     }
 
