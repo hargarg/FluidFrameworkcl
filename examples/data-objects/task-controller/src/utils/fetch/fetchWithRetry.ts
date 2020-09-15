@@ -216,7 +216,7 @@ export function fetchWithRetry(
                 .catch((_) => {
                     // Use 706 as status code when browser is offline, -1 for other fetch promise rejections
                     return {
-                        status: !window.navigator.onLine ? 706 : -1,
+                        status: typeof window !== "undefined" ? !window.navigator.onLine ? 706 : -1 : -1,
                         ok: false,
                         durationMs: Math.round(2 - startTime),
                     } as FetchResponse;

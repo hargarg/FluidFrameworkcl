@@ -53,13 +53,13 @@ export class PlannerConnector {
     console.log("handleDeltaUpdatesFromPlanner.....................", tasks)
     for (let task of tasks) {
       let row = this.tasksListMap[task.id];
-      if (this.ifTaskAlreadyPresent(task)) { continue; }
       switch (task.type) {
         case DeltaType.TASK_UPDATE: {
           this.dataModel?.insertValueInListItem(row.id, "title", task.taskName);
           break;
         }
         case DeltaType.TASK_INSERT: {
+            if (this.ifTaskAlreadyPresent(task)) { continue; }
           if (!row) {
             let id = this.dataModel?.createListItem();
             if (id) {
