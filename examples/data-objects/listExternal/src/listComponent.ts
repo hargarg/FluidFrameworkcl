@@ -12,10 +12,16 @@ import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
 import { SharedDirectory, IDirectoryValueChanged } from "@fluidframework/map";
 import { v4 as uuid } from "uuid";
 import { ConfigKey } from "./configKey";
+import { IListEvents } from "./interface"
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const pkg = require("../package.json");
 const ListComponentName = pkg.name as string;
+
+export interface IListComponent {
+    getAllListItems()
+}
+
 
 // Sample agent to run.
 export class ListComponent extends DataObject {
@@ -54,10 +60,14 @@ export class ListComponent extends DataObject {
         this.forwardEvent(this.lists, "op", "sequenceDelta");
     }
 
+    public getSize() {
+        return this.lists?.size
+    }
+
     public hasValueChanged() {
         if (this.lists !== undefined) {
             this.lists.on("valueChanged", (changed: IDirectoryValueChanged) => {
-                this.emit("listChanged", changed);
+                this.emit(IListEvents.ListValueChanged, changed);
             });
 
         }
@@ -65,7 +75,7 @@ export class ListComponent extends DataObject {
     /**
      *
      */
-    public getAllListItems() {
+    public getAllListItems<T>(): T {
         const item: any = {};
         const subdirs = this.lists?.subdirectories();
         if (subdirs) {
@@ -84,7 +94,6 @@ export class ListComponent extends DataObject {
      * @param listId
      */
     public createListItem(listId?: string) {
-        this.emit("createdList", listId);
         if (listId !== undefined) {
             this.lists?.createSubDirectory(listId);
             return listId;
@@ -93,6 +102,7 @@ export class ListComponent extends DataObject {
             this.lists?.createSubDirectory(id);
             return id;
         }
+        this.emit(IListEvents.ListCreated, listId);
     }
 
     /**
@@ -110,8 +120,9 @@ export class ListComponent extends DataObject {
      * @param value
      */
     public insertValueInListItem(listId: string, key: string, value: any) {
-        this.emit("insertOrUpdateAttribute", listId, key);
         this.lists?.getSubDirectory(listId).set(key, value);
+        this.emit(IListEvents.InsertUpdateListAttribute, listId, key);
+
     }
 
     /**
@@ -124,12 +135,17 @@ export class ListComponent extends DataObject {
     }
 
     public deleteListItem(listId: string) {
-        this.lists?.deleteSubDirectory(listId);
+        if (this.lists?.hasSubDirectory(listId)) {
+            this.lists?.deleteSubDirectory(listId);
+            this.emit(IListEvents.InsertUpdateListAttribute, listId);
+        }
     }
 
     public deleteListItemAttribute(listId: string, key: string) {
         this.lists?.getSubDirectory(listId).delete(key);
     }
+
+
 
     public async request(request: IRequest): Promise<IResponse> {
         return {
