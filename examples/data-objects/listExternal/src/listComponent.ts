@@ -18,9 +18,6 @@ import { IListEvents } from "./interface"
 const pkg = require("../package.json");
 const ListComponentName = pkg.name as string;
 
-export interface IListComponent {
-    getAllListItems()
-}
 
 
 // Sample agent to run.
@@ -75,7 +72,7 @@ export class ListComponent extends DataObject {
     /**
      *
      */
-    public getAllListItems<T>(): T {
+    public getAllItems<T>(): T {
         const item: any = {};
         const subdirs = this.lists?.subdirectories();
         if (subdirs) {
@@ -93,7 +90,7 @@ export class ListComponent extends DataObject {
      *
      * @param listId
      */
-    public createListItem(listId?: string) {
+    public createItem(listId?: string) {
         if (listId !== undefined) {
             this.lists?.createSubDirectory(listId);
             return listId;
@@ -109,7 +106,7 @@ export class ListComponent extends DataObject {
      *
      * @param listId
      */
-    public getListItemDirectory(listId: string) {
+    public getItemDirectory(listId: string) {
         return this.lists?.getSubDirectory(listId);
     }
 
@@ -119,7 +116,7 @@ export class ListComponent extends DataObject {
      * @param key
      * @param value
      */
-    public insertValueInListItem(listId: string, key: string, value: any) {
+    public insertOrUpdateAttributeInItem<T>(listId: string, key: string, value: T) {
         this.lists?.getSubDirectory(listId).set(key, value);
         this.emit(IListEvents.InsertUpdateListAttribute, listId, key);
 
@@ -130,18 +127,18 @@ export class ListComponent extends DataObject {
      * @param listId
      * @param key
      */
-    public getKeyValueInList(listId: string, key: string) {
+    public getAttributeInList(listId: string, key: string) {
         this.lists?.getSubDirectory(listId).get(key);
     }
 
-    public deleteListItem(listId: string) {
+    public deleteItem(listId: string) {
         if (this.lists?.hasSubDirectory(listId)) {
             this.lists?.deleteSubDirectory(listId);
             this.emit(IListEvents.InsertUpdateListAttribute, listId);
         }
     }
 
-    public deleteListItemAttribute(listId: string, key: string) {
+    public deleteItemAttribute(listId: string, key: string) {
         this.lists?.getSubDirectory(listId).delete(key);
     }
 
